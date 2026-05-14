@@ -1,0 +1,1343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Portfolio</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #F5F0E8;
+    --ink: #1A1A2E;
+    --gold: #C9A84C;
+    --gold-light: #E8D5A3;
+    --ink-light: #2E2E4A;
+    --cream-dark: #E8E0CC;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── EDIT MODE TOGGLE ── */
+  .edit-bar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 1000;
+    background: var(--ink);
+    color: var(--cream);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 28px;
+    font-size: 13px;
+    letter-spacing: .06em;
+  }
+  .edit-bar span { opacity: .6; }
+  .btn-edit {
+    background: var(--gold);
+    color: var(--ink);
+    border: none;
+    padding: 7px 20px;
+    border-radius: 2px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    font-size: 13px;
+    cursor: pointer;
+    letter-spacing: .05em;
+    transition: background .2s;
+  }
+  .btn-edit:hover { background: var(--gold-light); }
+
+  /* ── WRAPPER ── */
+  .wrapper { padding-top: 52px; }
+
+  /* ── HERO ── */
+  .hero {
+    display: grid;
+    grid-template-columns: 1fr 420px;
+    min-height: 100vh;
+    position: relative;
+  }
+
+  .hero-text {
+    padding: 80px 60px 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+  }
+
+  .hero-text::after {
+    content: '';
+    position: absolute;
+    bottom: 60px; right: 0;
+    width: 1px; height: 200px;
+    background: linear-gradient(to bottom, transparent, var(--gold), transparent);
+  }
+
+  .tag-line {
+    font-size: 11px;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 28px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .tag-line::before {
+    content: '';
+    display: inline-block;
+    width: 32px; height: 1px;
+    background: var(--gold);
+  }
+
+  h1.name {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(44px, 6vw, 82px);
+    line-height: 1.05;
+    color: var(--ink);
+    margin-bottom: 20px;
+  }
+  h1.name em { font-style: italic; color: var(--gold); }
+
+  .hero-sub {
+    font-size: 16px;
+    color: var(--ink);
+    opacity: .65;
+    max-width: 480px;
+    line-height: 1.8;
+    margin-bottom: 44px;
+  }
+
+  .hero-cta {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .btn-primary {
+    background: var(--ink);
+    color: var(--cream);
+    border: none;
+    padding: 14px 32px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    letter-spacing: .06em;
+    cursor: pointer;
+    transition: background .2s, transform .15s;
+    text-decoration: none;
+    display: inline-block;
+  }
+  .btn-primary:hover { background: var(--ink-light); transform: translateY(-1px); }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--ink);
+    border: 1.5px solid var(--ink);
+    padding: 13px 32px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    letter-spacing: .06em;
+    cursor: pointer;
+    transition: all .2s;
+    text-decoration: none;
+    display: inline-block;
+  }
+  .btn-outline:hover { background: var(--ink); color: var(--cream); }
+
+  /* ── HERO IMAGE PANEL ── */
+  .hero-image-panel {
+    background: var(--ink);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .hero-image-panel .img-container {
+    width: 100%; height: 100%;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-photo {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+    transition: transform .3s;
+  }
+
+  .photo-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(26,26,46,.35) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  /* image adjust controls */
+  .img-controls {
+    display: none;
+    position: absolute;
+    bottom: 18px; left: 50%;
+    transform: translateX(-50%);
+    background: rgba(26,26,46,.88);
+    border-radius: 4px;
+    padding: 12px 18px;
+    gap: 16px;
+    flex-direction: column;
+    min-width: 220px;
+    z-index: 10;
+  }
+  .edit-mode .img-controls { display: flex; }
+
+  .ctrl-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 11px;
+    color: var(--cream);
+    letter-spacing: .05em;
+  }
+  .ctrl-row label { width: 60px; opacity: .7; }
+  .ctrl-row input[type=range] {
+    flex: 1;
+    accent-color: var(--gold);
+    cursor: pointer;
+  }
+
+  .upload-photo-btn {
+    position: absolute;
+    top: 18px; right: 18px;
+    background: var(--gold);
+    color: var(--ink);
+    border: none;
+    padding: 8px 14px;
+    font-size: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+    letter-spacing: .05em;
+    display: none;
+    border-radius: 2px;
+    z-index: 10;
+  }
+  .edit-mode .upload-photo-btn { display: block; }
+
+  /* placeholder when no photo */
+  .photo-placeholder {
+    width: 100%; height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--cream);
+    opacity: .35;
+    gap: 12px;
+    font-size: 14px;
+    letter-spacing: .08em;
+  }
+  .photo-placeholder svg { width: 48px; height: 48px; }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    left: 28px; top: 50%;
+    transform: translateY(-50%);
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .nav-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--ink);
+    opacity: .25;
+    cursor: pointer;
+    transition: all .2s;
+    position: relative;
+  }
+  .nav-dot:hover, .nav-dot.active {
+    opacity: 1;
+    background: var(--gold);
+    transform: scale(1.5);
+  }
+
+  /* ── SECTIONS ── */
+  section { padding: 80px 80px 80px 100px; position: relative; }
+
+  .section-label {
+    font-size: 11px;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 48px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, var(--gold-light), transparent);
+  }
+
+  h2.section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(32px, 4vw, 52px);
+    line-height: 1.15;
+    margin-bottom: 32px;
+    color: var(--ink);
+  }
+
+  /* ── ABOUT ── */
+  #about { background: var(--cream); }
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: start;
+  }
+  .about-body {
+    font-size: 16px;
+    line-height: 1.9;
+    color: var(--ink);
+    opacity: .75;
+  }
+  .skills-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 28px;
+  }
+  .skill-tag {
+    padding: 7px 16px;
+    border: 1.5px solid var(--gold-light);
+    font-size: 12px;
+    letter-spacing: .08em;
+    color: var(--ink-light);
+    cursor: default;
+    transition: all .2s;
+  }
+  .skill-tag:hover { background: var(--ink); color: var(--cream); border-color: var(--ink); }
+
+  .about-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+  .stat-box {
+    padding: 28px;
+    background: var(--ink);
+    color: var(--cream);
+  }
+  .stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 42px;
+    color: var(--gold);
+    display: block;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  .stat-label { font-size: 11px; letter-spacing: .12em; opacity: .6; text-transform: uppercase; }
+
+  /* ── PROJECTS ── */
+  #projects { background: var(--cream-dark); }
+
+  .projects-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 0;
+  }
+
+  .btn-add-project {
+    background: var(--gold);
+    color: var(--ink);
+    border: none;
+    padding: 10px 22px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    letter-spacing: .06em;
+    display: none;
+    transition: background .2s;
+    border-radius: 2px;
+  }
+  .edit-mode .btn-add-project { display: inline-block; }
+  .btn-add-project:hover { background: var(--gold-light); }
+
+  .projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 28px;
+    margin-top: 40px;
+  }
+
+  .project-card {
+    background: var(--cream);
+    border: 1px solid var(--cream-dark);
+    overflow: hidden;
+    transition: transform .25s, box-shadow .25s;
+    position: relative;
+    cursor: pointer;
+  }
+  .project-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 60px rgba(26,26,46,.12);
+  }
+
+  /* ── CARD IMAGE WRAP ── */
+  .card-img-wrap {
+    height: 220px;
+    background: var(--ink);
+    position: relative;
+    overflow: hidden;
+    cursor: default;
+    transition: background .2s;
+  }
+
+  /* In edit mode the whole wrap becomes a drop zone */
+  .edit-mode .card-img-wrap {
+    cursor: pointer;
+  }
+  .edit-mode .card-img-wrap:hover {
+    background: #12122a;
+  }
+  .card-img-wrap.drag-over {
+    outline: 2px dashed var(--gold);
+    outline-offset: -4px;
+    background: #12122a;
+  }
+
+  .card-img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform .4s;
+  }
+  .project-card:hover .card-img { transform: scale(1.04); }
+
+  /* Drop zone placeholder — shown in edit mode when no image */
+  .card-dropzone {
+    position: absolute; inset: 0;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    color: var(--cream);
+    pointer-events: none;
+    transition: opacity .2s;
+  }
+  .card-dropzone svg { width: 36px; height: 36px; opacity: .5; }
+  .card-dropzone .dz-label {
+    font-size: 11px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    opacity: .45;
+  }
+  .card-dropzone .dz-sub {
+    font-size: 10px;
+    opacity: .28;
+    letter-spacing: .06em;
+  }
+  /* Show dropzone only in edit mode AND when no image */
+  .edit-mode .card-img-wrap.no-img .card-dropzone { display: flex; }
+  /* When image exists in edit mode, show a small re-upload hint on hover */
+  .edit-mode .card-img-wrap:not(.no-img):hover::after {
+    content: '↑ Replace image';
+    position: absolute;
+    bottom: 10px; left: 50%;
+    transform: translateX(-50%);
+    background: rgba(26,26,46,.82);
+    color: var(--cream);
+    font-size: 11px;
+    letter-spacing: .08em;
+    padding: 5px 14px;
+    border-radius: 2px;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+
+  /* old placeholder icon (hidden, replaced by dropzone) */
+  .card-img-placeholder { display: none; }
+
+  /* ── PER-CARD IMAGE ADJUST PANEL ── */
+  .card-adjust-panel {
+    display: none;
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    background: rgba(14,14,30,.92);
+    padding: 10px 14px;
+    gap: 8px;
+    flex-direction: column;
+    z-index: 5;
+    backdrop-filter: blur(4px);
+  }
+  .edit-mode .card-img-wrap:not(.no-img):hover .card-adjust-panel,
+  .card-img-wrap.adjusting .card-adjust-panel { display: flex; }
+
+  .card-ctrl {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 10px;
+    color: var(--cream);
+    opacity: .85;
+  }
+  .card-ctrl label { width: 54px; font-size: 9px; letter-spacing: .08em; opacity: .65; text-transform: uppercase; flex-shrink: 0; }
+  .card-ctrl input[type=range] {
+    flex: 1;
+    accent-color: var(--gold);
+    cursor: pointer;
+    height: 3px;
+  }
+
+  .card-body { padding: 24px; }
+  .card-category {
+    font-size: 10px;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 10px;
+  }
+  .card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    color: var(--ink);
+    margin-bottom: 10px;
+    line-height: 1.3;
+  }
+  .card-desc {
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--ink);
+    opacity: .6;
+    margin-bottom: 18px;
+  }
+  .card-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .card-tag {
+    font-size: 10px;
+    padding: 4px 10px;
+    background: var(--cream-dark);
+    color: var(--ink-light);
+    letter-spacing: .06em;
+    border-radius: 1px;
+  }
+
+  /* card top-right edit / delete buttons */
+  .card-edit-btns {
+    position: absolute;
+    top: 10px; right: 10px;
+    display: none;
+    gap: 6px;
+    z-index: 10;
+  }
+  .edit-mode .card-edit-btns { display: flex; }
+  .card-edit-btn {
+    width: 30px; height: 30px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 2px;
+    transition: opacity .2s;
+  }
+  .card-edit-btn.edit { background: var(--gold); color: var(--ink); }
+  .card-edit-btn.del { background: #c0392b; color: #fff; }
+
+  /* remove the old bottom-left upload button — replaced by full-area click */
+  .card-upload-btn { display: none !important; }
+
+  /* ── CONTACT ── */
+  #contact { background: var(--ink); }
+  #contact .section-label { color: var(--gold); }
+  #contact .section-label::after { background: linear-gradient(to right, rgba(201,168,76,.4), transparent); }
+  #contact h2.section-title { color: var(--cream); }
+
+  .contact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: start;
+  }
+  .contact-intro {
+    font-size: 16px;
+    line-height: 1.85;
+    color: var(--cream);
+    opacity: .65;
+    margin-bottom: 36px;
+  }
+  .contact-links { display: flex; flex-direction: column; gap: 14px; }
+  .contact-link {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    color: var(--cream);
+    text-decoration: none;
+    font-size: 14px;
+    opacity: .7;
+    transition: opacity .2s;
+  }
+  .contact-link:hover { opacity: 1; }
+  .contact-link-icon {
+    width: 36px; height: 36px;
+    border: 1px solid rgba(201,168,76,.3);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px;
+    color: var(--gold);
+    flex-shrink: 0;
+    border-radius: 2px;
+  }
+
+  .contact-form { display: flex; flex-direction: column; gap: 16px; }
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+  .form-label { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--cream); opacity: .5; }
+  .form-input {
+    background: rgba(245,240,232,.06);
+    border: 1px solid rgba(245,240,232,.12);
+    color: var(--cream);
+    padding: 12px 16px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: border-color .2s;
+    resize: vertical;
+  }
+  .form-input:focus { border-color: var(--gold); }
+  .form-input::placeholder { opacity: .35; }
+  .btn-send {
+    background: var(--gold);
+    color: var(--ink);
+    border: none;
+    padding: 14px 32px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    font-size: 14px;
+    letter-spacing: .08em;
+    cursor: pointer;
+    transition: background .2s, transform .15s;
+    align-self: flex-start;
+    border-radius: 2px;
+  }
+  .btn-send:hover { background: var(--gold-light); transform: translateY(-1px); }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--ink-light);
+    color: var(--cream);
+    text-align: center;
+    padding: 28px;
+    font-size: 12px;
+    opacity: .5;
+    letter-spacing: .08em;
+  }
+
+  /* ── MODALS ── */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(26,26,46,.75);
+    z-index: 2000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--cream);
+    padding: 40px;
+    width: 90%;
+    max-width: 520px;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    animation: modalIn .25s ease;
+  }
+  @keyframes modalIn { from { transform: translateY(20px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+  .modal h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    margin-bottom: 28px;
+    color: var(--ink);
+  }
+  .modal-close {
+    position: absolute; top: 18px; right: 20px;
+    background: none; border: none;
+    font-size: 22px; cursor: pointer;
+    color: var(--ink); opacity: .5;
+    line-height: 1;
+  }
+  .modal-close:hover { opacity: 1; }
+  .modal .form-input {
+    background: var(--cream-dark);
+    border: 1px solid var(--gold-light);
+    color: var(--ink);
+  }
+  .modal .form-label { color: var(--ink); opacity: .6; }
+  .modal .form-input:focus { border-color: var(--gold); }
+  .modal-actions { display: flex; gap: 12px; margin-top: 8px; }
+  .btn-save {
+    background: var(--ink);
+    color: var(--cream);
+    border: none;
+    padding: 12px 28px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+    letter-spacing: .06em;
+    border-radius: 2px;
+    transition: background .2s;
+  }
+  .btn-save:hover { background: var(--ink-light); }
+  .btn-cancel {
+    background: transparent;
+    color: var(--ink);
+    border: 1.5px solid var(--ink);
+    padding: 11px 24px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all .2s;
+  }
+  .btn-cancel:hover { background: var(--ink); color: var(--cream); }
+
+  /* inline editable */
+  [contenteditable="true"] {
+    outline: 2px dashed var(--gold);
+    outline-offset: 4px;
+    cursor: text;
+    border-radius: 1px;
+    min-width: 40px;
+    display: inline-block;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    .hero { grid-template-columns: 1fr; }
+    .hero-image-panel { height: 55vw; min-height: 280px; }
+    section { padding: 60px 28px 60px 48px; }
+    .about-grid, .contact-grid { grid-template-columns: 1fr; gap: 36px; }
+    nav { left: 12px; }
+    .hero-text { padding: 50px 28px; }
+    .projects-grid { grid-template-columns: 1fr; }
+  }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: var(--cream); }
+  ::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 4px; }
+
+  /* hidden file input */
+  #photoInput, #cardPhotoInput { display: none; }
+</style>
+</head>
+<body>
+
+<!-- Edit Bar -->
+<div class="edit-bar">
+  <span>✦ PORTFOLIO BUILDER — click "Edit Mode" to customize everything</span>
+  <button class="btn-edit" id="editToggle" onclick="toggleEdit()">✏ Edit Mode</button>
+</div>
+
+<!-- Side Nav Dots -->
+<nav id="sideNav">
+  <div class="nav-dot active" data-target="hero" onclick="scrollTo('hero')" title="Home"></div>
+  <div class="nav-dot" data-target="about" onclick="scrollTo('about')" title="About"></div>
+  <div class="nav-dot" data-target="projects" onclick="scrollTo('projects')" title="Projects"></div>
+  <div class="nav-dot" data-target="contact" onclick="scrollTo('contact')" title="Contact"></div>
+</nav>
+
+<div class="wrapper">
+
+  <!-- ══ HERO ══ -->
+  <section class="hero" id="hero">
+    <div class="hero-text">
+      <div class="tag-line" id="taglineText" contenteditable="false">Available for Work</div>
+      <h1 class="name">
+        <span id="heroName" contenteditable="false">Your <em>Name</em></span>
+      </h1>
+      <p class="hero-sub" id="heroSub" contenteditable="false">
+        Creative professional crafting thoughtful digital experiences. Passionate about design, code, and everything in between.
+      </p>
+      <div class="hero-cta">
+        <a href="#projects" class="btn-primary" onclick="smoothScroll('projects')">View My Work</a>
+        <a href="#contact" class="btn-outline" onclick="smoothScroll('contact')">Get in Touch</a>
+      </div>
+    </div>
+
+    <div class="hero-image-panel">
+      <div class="img-container" id="heroImgContainer">
+        <div class="photo-placeholder" id="photoPlaceholder">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+            <rect x="3" y="3" width="18" height="18" rx="2"/>
+            <circle cx="8.5" cy="8.5" r="1.5"/>
+            <path d="M21 15l-5-5L5 21"/>
+          </svg>
+          <span>YOUR PHOTO HERE</span>
+        </div>
+        <img id="heroPhoto" class="hero-photo" src="" alt="Profile photo" style="display:none;">
+        <div class="photo-overlay"></div>
+      </div>
+
+      <button class="upload-photo-btn" onclick="document.getElementById('photoInput').click()">⊕ Upload Photo</button>
+
+      <div class="img-controls" id="imgControls">
+        <div class="ctrl-row">
+          <label>Scale</label>
+          <input type="range" id="scaleSlider" min="80" max="200" value="100" oninput="applyImgTransform()">
+        </div>
+        <div class="ctrl-row">
+          <label>X Pos</label>
+          <input type="range" id="posXSlider" min="-50" max="50" value="0" oninput="applyImgTransform()">
+        </div>
+        <div class="ctrl-row">
+          <label>Y Pos</label>
+          <input type="range" id="posYSlider" min="-50" max="50" value="0" oninput="applyImgTransform()">
+        </div>
+        <div class="ctrl-row">
+          <label>Brightness</label>
+          <input type="range" id="brightSlider" min="50" max="150" value="100" oninput="applyImgTransform()">
+        </div>
+        <div class="ctrl-row">
+          <label>Contrast</label>
+          <input type="range" id="contrastSlider" min="70" max="140" value="100" oninput="applyImgTransform()">
+        </div>
+      </div>
+
+      <input type="file" id="photoInput" accept="image/*" onchange="loadHeroPhoto(event)">
+    </div>
+  </section>
+
+  <!-- ══ ABOUT ══ -->
+  <section id="about">
+    <div class="section-label">About Me</div>
+    <div class="about-grid">
+      <div>
+        <h2 class="section-title" id="aboutTitle" contenteditable="false">Crafting with <em style="font-style:italic;color:var(--gold)">purpose</em></h2>
+        <p class="about-body" id="aboutBody" contenteditable="false">
+          I'm a creative professional with a passion for building beautiful, functional digital products. With a keen eye for detail and a love for clean design, I bring ideas to life through thoughtful execution.<br><br>
+          When I'm not designing or coding, you'll find me exploring new places, experimenting with photography, or diving into a good book.
+        </p>
+        <div class="skills-list" id="skillsList">
+          <span class="skill-tag">UI Design</span>
+          <span class="skill-tag">Web Development</span>
+          <span class="skill-tag">Branding</span>
+          <span class="skill-tag">Photography</span>
+          <span class="skill-tag">Motion Design</span>
+          <span class="skill-tag">Figma</span>
+        </div>
+        <button id="addSkillBtn" style="display:none;margin-top:14px;background:transparent;border:1.5px dashed var(--gold);color:var(--gold);padding:6px 16px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:12px;border-radius:2px;" onclick="addSkill()">+ Add Skill</button>
+      </div>
+
+      <div class="about-stats">
+        <div class="stat-box">
+          <span class="stat-num" id="stat1num" contenteditable="false">3+</span>
+          <span class="stat-label" id="stat1lbl" contenteditable="false">Years Experience</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-num" id="stat2num" contenteditable="false">20+</span>
+          <span class="stat-label" id="stat2lbl" contenteditable="false">Projects Done</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-num" id="stat3num" contenteditable="false">12+</span>
+          <span class="stat-label" id="stat3lbl" contenteditable="false">Happy Clients</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-num" id="stat4num" contenteditable="false">5★</span>
+          <span class="stat-label" id="stat4lbl" contenteditable="false">Average Rating</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ PROJECTS ══ -->
+  <section id="projects">
+    <div class="projects-header">
+      <div>
+        <div class="section-label">My Work</div>
+        <h2 class="section-title" id="projectsTitle" contenteditable="false">Selected Projects</h2>
+      </div>
+      <button class="btn-add-project" onclick="openAddProject()">+ Add Project</button>
+    </div>
+
+    <div class="projects-grid" id="projectsGrid">
+
+      <div class="project-card" data-id="1">
+        <div class="card-img-wrap no-img" data-card-id="1">
+          <img class="card-img" src="" alt="" style="display:none;">
+          <div class="card-dropzone">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+            <span class="dz-label">Click or Drop Image</span>
+            <span class="dz-sub">JPG, PNG, WEBP</span>
+          </div>
+          <div class="card-adjust-panel">
+            <div class="card-ctrl"><label>Scale</label><input type="range" min="80" max="200" value="100" oninput="applyCardTransform(this,1)"></div>
+            <div class="card-ctrl"><label>Brightness</label><input type="range" min="50" max="150" value="100" oninput="applyCardTransform(this,1)"></div>
+            <div class="card-ctrl"><label>Contrast</label><input type="range" min="70" max="140" value="100" oninput="applyCardTransform(this,1)"></div>
+          </div>
+          <div class="card-edit-btns">
+            <button class="card-edit-btn edit" onclick="editProject(1);event.stopPropagation()">✎</button>
+            <button class="card-edit-btn del" onclick="deleteProject(1);event.stopPropagation()">✕</button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="card-category">Web Design</div>
+          <div class="card-title">Brand Identity Redesign</div>
+          <div class="card-desc">A complete visual overhaul for a lifestyle brand, from logo to full digital presence.</div>
+          <div class="card-tags"><span class="card-tag">Branding</span><span class="card-tag">Figma</span><span class="card-tag">Identity</span></div>
+        </div>
+      </div>
+
+      <div class="project-card" data-id="2">
+        <div class="card-img-wrap no-img" data-card-id="2">
+          <img class="card-img" src="" alt="" style="display:none;">
+          <div class="card-dropzone">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+            <span class="dz-label">Click or Drop Image</span>
+            <span class="dz-sub">JPG, PNG, WEBP</span>
+          </div>
+          <div class="card-adjust-panel">
+            <div class="card-ctrl"><label>Scale</label><input type="range" min="80" max="200" value="100" oninput="applyCardTransform(this,2)"></div>
+            <div class="card-ctrl"><label>Brightness</label><input type="range" min="50" max="150" value="100" oninput="applyCardTransform(this,2)"></div>
+            <div class="card-ctrl"><label>Contrast</label><input type="range" min="70" max="140" value="100" oninput="applyCardTransform(this,2)"></div>
+          </div>
+          <div class="card-edit-btns">
+            <button class="card-edit-btn edit" onclick="editProject(2);event.stopPropagation()">✎</button>
+            <button class="card-edit-btn del" onclick="deleteProject(2);event.stopPropagation()">✕</button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="card-category">Development</div>
+          <div class="card-title">E-Commerce Platform</div>
+          <div class="card-desc">Full-stack online store with custom CMS, payment integration, and real-time analytics.</div>
+          <div class="card-tags"><span class="card-tag">React</span><span class="card-tag">Node.js</span><span class="card-tag">Stripe</span></div>
+        </div>
+      </div>
+
+      <div class="project-card" data-id="3">
+        <div class="card-img-wrap no-img" data-card-id="3">
+          <img class="card-img" src="" alt="" style="display:none;">
+          <div class="card-dropzone">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+            <span class="dz-label">Click or Drop Image</span>
+            <span class="dz-sub">JPG, PNG, WEBP</span>
+          </div>
+          <div class="card-adjust-panel">
+            <div class="card-ctrl"><label>Scale</label><input type="range" min="80" max="200" value="100" oninput="applyCardTransform(this,3)"></div>
+            <div class="card-ctrl"><label>Brightness</label><input type="range" min="50" max="150" value="100" oninput="applyCardTransform(this,3)"></div>
+            <div class="card-ctrl"><label>Contrast</label><input type="range" min="70" max="140" value="100" oninput="applyCardTransform(this,3)"></div>
+          </div>
+          <div class="card-edit-btns">
+            <button class="card-edit-btn edit" onclick="editProject(3);event.stopPropagation()">✎</button>
+            <button class="card-edit-btn del" onclick="deleteProject(3);event.stopPropagation()">✕</button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="card-category">Photography</div>
+          <div class="card-title">Editorial Lookbook</div>
+          <div class="card-desc">Art direction and photography for a fashion label's seasonal collection campaign.</div>
+          <div class="card-tags"><span class="card-tag">Photography</span><span class="card-tag">Lightroom</span><span class="card-tag">Editorial</span></div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══ CONTACT ══ -->
+  <section id="contact">
+    <div class="section-label">Get In Touch</div>
+    <div class="contact-grid">
+      <div>
+        <h2 class="section-title" id="contactTitle" contenteditable="false">Let's work <em style="font-style:italic;">together</em></h2>
+        <p class="contact-intro" id="contactIntro" contenteditable="false">
+          Have a project in mind or just want to say hello? My inbox is always open. Whether it's a big idea or a quick question — I'd love to hear from you.
+        </p>
+        <div class="contact-links">
+          <a href="mailto:hello@example.com" class="contact-link">
+            <div class="contact-link-icon">@</div>
+            <span id="contactEmail" contenteditable="false">hello@yourname.com</span>
+          </a>
+          <a href="#" class="contact-link">
+            <div class="contact-link-icon">in</div>
+            <span id="contactLinkedIn" contenteditable="false">linkedin.com/in/yourname</span>
+          </a>
+          <a href="#" class="contact-link">
+            <div class="contact-link-icon">gh</div>
+            <span id="contactGitHub" contenteditable="false">github.com/yourname</span>
+          </a>
+        </div>
+      </div>
+      <div>
+        <form class="contact-form" onsubmit="return false;">
+          <div class="form-group">
+            <label class="form-label">Your Name</label>
+            <input class="form-input" type="text" placeholder="Jane Smith">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email Address</label>
+            <input class="form-input" type="email" placeholder="jane@example.com">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Message</label>
+            <textarea class="form-input" rows="5" placeholder="Tell me about your project…"></textarea>
+          </div>
+          <button class="btn-send" type="submit" onclick="sendMsg()">Send Message →</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <span id="footerText" contenteditable="false">© 2025 Your Name · Built with passion</span>
+  </footer>
+</div>
+
+<!-- ══ PROJECT MODAL ══ -->
+<div class="modal-overlay" id="projectModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <h3 id="modalTitle">Add Project</h3>
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <div class="form-group">
+        <label class="form-label">Project Title</label>
+        <input class="form-input" id="modalProjTitle" placeholder="My Awesome Project">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Category</label>
+        <input class="form-input" id="modalProjCat" placeholder="Web Design, Photography, etc.">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Description</label>
+        <textarea class="form-input" id="modalProjDesc" rows="3" placeholder="Brief description of the project…"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tags (comma separated)</label>
+        <input class="form-input" id="modalProjTags" placeholder="React, Figma, Branding">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Project URL (optional)</label>
+        <input class="form-input" id="modalProjUrl" placeholder="https://…">
+      </div>
+    </div>
+    <div class="modal-actions" style="margin-top:24px;">
+      <button class="btn-save" onclick="saveProject()">Save Project</button>
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- hidden card photo input -->
+<input type="file" id="cardPhotoInput" accept="image/*" onchange="loadCardPhoto(event)">
+
+<script>
+  /* ─── STATE ─── */
+  let isEditMode = false;
+  let projectIdCounter = 4;
+  let editingProjectId = null;
+  let currentCardPhotoId = null;
+
+  const editableIds = [
+    'taglineText','heroName','heroSub',
+    'aboutTitle','aboutBody',
+    'stat1num','stat1lbl','stat2num','stat2lbl','stat3num','stat3lbl','stat4num','stat4lbl',
+    'projectsTitle','contactTitle','contactIntro',
+    'contactEmail','contactLinkedIn','contactGitHub','footerText'
+  ];
+
+  /* ─── EDIT MODE ─── */
+  function toggleEdit() {
+    isEditMode = !isEditMode;
+    document.body.classList.toggle('edit-mode', isEditMode);
+    const btn = document.getElementById('editToggle');
+    btn.textContent = isEditMode ? '✓ Done Editing' : '✏ Edit Mode';
+
+    editableIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.setAttribute('contenteditable', isEditMode ? 'true' : 'false');
+    });
+
+    document.getElementById('addSkillBtn').style.display = isEditMode ? 'inline-block' : 'none';
+    if (isEditMode) attachSkillEditing();
+
+    // Register / unregister card wrap click listeners
+    document.querySelectorAll('.card-img-wrap').forEach(wrap => {
+      if (isEditMode) {
+        wrap.addEventListener('click', cardWrapClick);
+        wrap.addEventListener('dragover', cardDragOver);
+        wrap.addEventListener('dragleave', cardDragLeave);
+        wrap.addEventListener('drop', cardDrop);
+      } else {
+        wrap.removeEventListener('click', cardWrapClick);
+        wrap.removeEventListener('dragover', cardDragOver);
+        wrap.removeEventListener('dragleave', cardDragLeave);
+        wrap.removeEventListener('drop', cardDrop);
+      }
+    });
+  }
+
+  /* ─── CARD WRAP CLICK → file picker ─── */
+  function cardWrapClick(e) {
+    // Don't trigger if clicking the edit/delete buttons
+    if (e.target.closest('.card-edit-btns')) return;
+    // Don't trigger if clicking a range input inside adjust panel
+    if (e.target.tagName === 'INPUT') return;
+    const wrap = e.currentTarget;
+    const cardId = wrap.dataset.cardId;
+    currentCardPhotoId = cardId;
+    document.getElementById('cardPhotoInput').click();
+  }
+
+  /* ─── DRAG & DROP ─── */
+  function cardDragOver(e) {
+    e.preventDefault();
+    e.currentTarget.classList.add('drag-over');
+  }
+  function cardDragLeave(e) {
+    e.currentTarget.classList.remove('drag-over');
+  }
+  function cardDrop(e) {
+    e.preventDefault();
+    const wrap = e.currentTarget;
+    wrap.classList.remove('drag-over');
+    const file = e.dataTransfer.files[0];
+    if (file && file.type.startsWith('image/')) {
+      currentCardPhotoId = wrap.dataset.cardId;
+      loadImageIntoCard(file, currentCardPhotoId);
+    }
+  }
+
+  /* ─── LOAD IMAGE INTO CARD ─── */
+  function loadImageIntoCard(file, cardId) {
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const wrap = document.querySelector(`.card-img-wrap[data-card-id="${cardId}"]`);
+      if (!wrap) return;
+      const img = wrap.querySelector('.card-img');
+      img.src = ev.target.result;
+      img.style.display = 'block';
+      wrap.classList.remove('no-img');
+      // Reset sliders
+      wrap.querySelectorAll('input[type=range]').forEach(r => {
+        r.value = r.min === '80' ? 100 : 100;
+      });
+      applyCardTransformFromWrap(wrap, cardId);
+    };
+    reader.readAsDataURL(file);
+  }
+
+  /* ─── FILE INPUT CHANGE ─── */
+  function loadCardPhoto(e) {
+    const file = e.target.files[0];
+    if (!file || !currentCardPhotoId) return;
+    loadImageIntoCard(file, currentCardPhotoId);
+    e.target.value = '';
+  }
+
+  /* ─── PER-CARD IMAGE TRANSFORM ─── */
+  function applyCardTransform(slider, cardId) {
+    const wrap = document.querySelector(`.card-img-wrap[data-card-id="${cardId}"]`);
+    if (wrap) applyCardTransformFromWrap(wrap, cardId);
+  }
+
+  function applyCardTransformFromWrap(wrap, cardId) {
+    const img = wrap.querySelector('.card-img');
+    if (!img || img.style.display === 'none') return;
+    const sliders = wrap.querySelectorAll('input[type=range]');
+    const scale   = sliders[0] ? sliders[0].value / 100 : 1;
+    const bright  = sliders[1] ? sliders[1].value : 100;
+    const contrast= sliders[2] ? sliders[2].value : 100;
+    img.style.transform = `scale(${scale})`;
+    img.style.filter = `brightness(${bright}%) contrast(${contrast}%)`;
+  }
+
+  /* ─── SCROLL ─── */
+  function smoothScroll(id) {
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+    return false;
+  }
+  function scrollTo(id) { smoothScroll(id); }
+
+  const sections = ['hero','about','projects','contact'];
+  window.addEventListener('scroll', () => {
+    let current = 'hero';
+    sections.forEach(id => {
+      const el = document.getElementById(id);
+      if (el && window.scrollY >= el.offsetTop - 200) current = id;
+    });
+    document.querySelectorAll('.nav-dot').forEach(d => {
+      d.classList.toggle('active', d.dataset.target === current);
+    });
+  });
+
+  /* ─── HERO PHOTO ─── */
+  function loadHeroPhoto(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const img = document.getElementById('heroPhoto');
+      img.src = ev.target.result;
+      img.style.display = 'block';
+      document.getElementById('photoPlaceholder').style.display = 'none';
+      applyImgTransform();
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function applyImgTransform() {
+    const img = document.getElementById('heroPhoto');
+    if (!img || img.style.display === 'none') return;
+    const scale = document.getElementById('scaleSlider').value / 100;
+    const tx = document.getElementById('posXSlider').value;
+    const ty = document.getElementById('posYSlider').value;
+    const bright = document.getElementById('brightSlider').value;
+    const contrast = document.getElementById('contrastSlider').value;
+    img.style.transform = `scale(${scale}) translate(${tx}px, ${ty}px)`;
+    img.style.filter = `brightness(${bright}%) contrast(${contrast}%)`;
+  }
+
+  /* ─── PROJECTS MODAL ─── */
+  function openAddProject() {
+    editingProjectId = null;
+    document.getElementById('modalTitle').textContent = 'Add Project';
+    ['modalProjTitle','modalProjCat','modalProjDesc','modalProjTags','modalProjUrl']
+      .forEach(id => document.getElementById(id).value = '');
+    document.getElementById('projectModal').classList.add('open');
+  }
+
+  function editProject(id) {
+    const card = document.querySelector(`.project-card[data-id="${id}"]`);
+    if (!card) return;
+    editingProjectId = id;
+    document.getElementById('modalTitle').textContent = 'Edit Project';
+    document.getElementById('modalProjTitle').value = card.querySelector('.card-title')?.textContent || '';
+    document.getElementById('modalProjCat').value   = card.querySelector('.card-category')?.textContent || '';
+    document.getElementById('modalProjDesc').value  = card.querySelector('.card-desc')?.textContent || '';
+    const tags = [...card.querySelectorAll('.card-tag')].map(t => t.textContent).join(', ');
+    document.getElementById('modalProjTags').value = tags;
+    document.getElementById('projectModal').classList.add('open');
+  }
+
+  function deleteProject(id) {
+    if (!confirm('Delete this project?')) return;
+    document.querySelector(`.project-card[data-id="${id}"]`)?.remove();
+  }
+
+  function closeModal() {
+    document.getElementById('projectModal').classList.remove('open');
+  }
+
+  function makeAdjustPanel(id) {
+    return `
+      <div class="card-adjust-panel">
+        <div class="card-ctrl"><label>Scale</label><input type="range" min="80" max="200" value="100" oninput="applyCardTransform(this,${id})"></div>
+        <div class="card-ctrl"><label>Brightness</label><input type="range" min="50" max="150" value="100" oninput="applyCardTransform(this,${id})"></div>
+        <div class="card-ctrl"><label>Contrast</label><input type="range" min="70" max="140" value="100" oninput="applyCardTransform(this,${id})"></div>
+      </div>`;
+  }
+
+  function saveProject() {
+    const title   = document.getElementById('modalProjTitle').value.trim() || 'Untitled Project';
+    const cat     = document.getElementById('modalProjCat').value.trim() || 'Project';
+    const desc    = document.getElementById('modalProjDesc').value.trim() || '';
+    const tagsRaw = document.getElementById('modalProjTags').value.trim();
+    const tags    = tagsRaw ? tagsRaw.split(',').map(t => t.trim()).filter(Boolean) : [];
+    const tagsHtml = tags.map(t => `<span class="card-tag">${t}</span>`).join('');
+
+    if (editingProjectId) {
+      const card = document.querySelector(`.project-card[data-id="${editingProjectId}"]`);
+      if (card) {
+        card.querySelector('.card-title').textContent    = title;
+        card.querySelector('.card-category').textContent = cat;
+        card.querySelector('.card-desc').textContent     = desc;
+        card.querySelector('.card-tags').innerHTML       = tagsHtml;
+      }
+    } else {
+      const id = projectIdCounter++;
+      const card = document.createElement('div');
+      card.className = 'project-card';
+      card.dataset.id = id;
+      card.innerHTML = `
+        <div class="card-img-wrap no-img" data-card-id="${id}">
+          <img class="card-img" src="" alt="" style="display:none;">
+          <div class="card-dropzone">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+            <span class="dz-label">Click or Drop Image</span>
+            <span class="dz-sub">JPG, PNG, WEBP</span>
+          </div>
+          ${makeAdjustPanel(id)}
+          <div class="card-edit-btns">
+            <button class="card-edit-btn edit" onclick="editProject(${id});event.stopPropagation()">✎</button>
+            <button class="card-edit-btn del" onclick="deleteProject(${id});event.stopPropagation()">✕</button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="card-category">${cat}</div>
+          <div class="card-title">${title}</div>
+          <div class="card-desc">${desc}</div>
+          <div class="card-tags">${tagsHtml}</div>
+        </div>`;
+      document.getElementById('projectsGrid').appendChild(card);
+
+      // Wire up events on the new wrap if we're in edit mode
+      if (isEditMode) {
+        const wrap = card.querySelector('.card-img-wrap');
+        wrap.addEventListener('click', cardWrapClick);
+        wrap.addEventListener('dragover', cardDragOver);
+        wrap.addEventListener('dragleave', cardDragLeave);
+        wrap.addEventListener('drop', cardDrop);
+      }
+    }
+    closeModal();
+  }
+
+  /* ─── SKILLS ─── */
+  function addSkill() {
+    const name = prompt('Enter skill name:');
+    if (!name) return;
+    const tag = document.createElement('span');
+    tag.className = 'skill-tag';
+    tag.textContent = name;
+    tag.addEventListener('click', () => { if (isEditMode && confirm('Remove this skill?')) tag.remove(); });
+    document.getElementById('skillsList').appendChild(tag);
+  }
+
+  function attachSkillEditing() {
+    document.querySelectorAll('.skill-tag').forEach(tag => {
+      if (!tag._editAttached) {
+        tag._editAttached = true;
+        tag.title = 'Click to remove';
+        tag.addEventListener('click', () => { if (isEditMode && confirm('Remove this skill?')) tag.remove(); });
+      }
+    });
+  }
+
+  /* ─── CONTACT FORM ─── */
+  function sendMsg() {
+    alert('Message sent! (Connect this to your backend or email service to make it functional.)');
+  }
+
+  /* ─── CLOSE MODAL ON OVERLAY CLICK ─── */
+  document.getElementById('projectModal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+</script>
+</body>
+</html>
